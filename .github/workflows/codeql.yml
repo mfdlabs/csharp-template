@@ -1,0 +1,38 @@
+name: "CodeQL Analysis"
+
+on:
+  # Run workflow file whenever a pull request is opened, or a commit is pushed to it.
+  pull_request:
+    types: [opened, synchronize]
+
+  # Run workflow file on commits to the main branch.
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  # Perform CodeQL analysis
+  codeql:
+    if: "!contains(toJSON(github.event.commits.*.message), '[SKIP ANALYSIS]')"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Setup
+      - name: "Clone Repository"
+        uses: actions/checkout@v2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: "csharp"
+          config-file: "./.github/configuration/codeql-config.yml"
+
+      # Autobuild
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      # Perform CodeQL analysis
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
